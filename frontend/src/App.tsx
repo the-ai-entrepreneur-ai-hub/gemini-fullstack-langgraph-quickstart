@@ -1,5 +1,5 @@
 import { useStream } from "@langchain/langgraph-sdk/react";
-import type { Message } from "@langchain/langgraph-sdk";
+import type { Message, ThreadState } from "@langchain/langgraph-sdk";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ProcessedEvent } from "@/components/ActivityTimeline";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
@@ -26,10 +26,25 @@ export default function App() {
       : "http://localhost:8123",
     assistantId: "agent",
     messagesKey: "messages",
-    onFinish: (event: any) => {
-      console.log(event);
+    onFinish: (
+      state: ThreadState<{
+        messages: Message[];
+        initial_search_query_count: number;
+        max_research_loops: number;
+        reasoning_model: string;
+      }>
+    ) => {
+      console.log(state);
     },
-    onUpdateEvent: (event: any) => {
+    onUpdateEvent: (event: {
+      generate_query?: { query_list: string[] };
+      web_research?: {
+        sources_gathered?: Array<{ label: string; [key: string]: unknown }>;
+      };
+      reflection?: { is_sufficient: boolean; follow_up_queries?: string[] };
+      finalize_answer?: unknown;
+      [key: string]: unknown; // To allow for other event types not explicitly defined
+    }) => {
       let processedEvent: ProcessedEvent | null = null;
       if (event.generate_query) {
         processedEvent = {
@@ -40,7 +55,11 @@ export default function App() {
         const sources = event.web_research.sources_gathered || [];
         const numSources = sources.length;
         const uniqueLabels = [
-          ...new Set(sources.map((s: any) => s.label).filter(Boolean)),
+          ...new Set(
+            sources
+              .map((s: { label: string; [key: string]: unknown }) => s.label)
+              .filter(Boolean)
+          ),
         ];
         const exampleLabels = uniqueLabels.slice(0, 3).join(", ");
         processedEvent = {
@@ -54,9 +73,9 @@ export default function App() {
           title: "Reflection",
           data: event.reflection.is_sufficient
             ? "Search successful, generating final answer."
-            : `Need more information, searching for ${event.reflection.follow_up_queries?.join(
-                ", "
-              ) || "additional information"}`,
+            : `Need more information, searching for ${(
+                event.reflection.follow_up_queries || []
+              ).join(", ")}`,
         };
       } else if (event.finalize_answer) {
         processedEvent = {
