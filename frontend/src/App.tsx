@@ -26,17 +26,21 @@ export default function App() {
       : "http://localhost:8123",
     assistantId: "agent",
     messagesKey: "messages",
-    onFinish: (state: ThreadState<{
-      messages: Message[];
-      initial_search_query_count: number;
-      max_research_loops: number;
-      reasoning_model: string;
-    }>) => {
+    onFinish: (
+      state: ThreadState<{
+        messages: Message[];
+        initial_search_query_count: number;
+        max_research_loops: number;
+        reasoning_model: string;
+      }>
+    ) => {
       console.log(state);
     },
     onUpdateEvent: (event: {
       generate_query?: { query_list: string[] };
-      web_research?: { sources_gathered?: Array<{ label: string; [key: string]: unknown }> };
+      web_research?: {
+        sources_gathered?: Array<{ label: string; [key: string]: unknown }>;
+      };
       reflection?: { is_sufficient: boolean; follow_up_queries?: string[] };
       finalize_answer?: unknown;
       [key: string]: unknown; // To allow for other event types not explicitly defined
@@ -51,7 +55,11 @@ export default function App() {
         const sources = event.web_research.sources_gathered || [];
         const numSources = sources.length;
         const uniqueLabels = [
-          ...new Set(sources.map((s: { label: string; [key: string]: unknown }) => s.label).filter(Boolean)),
+          ...new Set(
+            sources
+              .map((s: { label: string; [key: string]: unknown }) => s.label)
+              .filter(Boolean)
+          ),
         ];
         const exampleLabels = uniqueLabels.slice(0, 3).join(", ");
         processedEvent = {
@@ -65,9 +73,9 @@ export default function App() {
           title: "Reflection",
           data: event.reflection.is_sufficient
             ? "Search successful, generating final answer."
-            : `Need more information, searching for ${(event.reflection.follow_up_queries || []).join(
-                ", "
-              )}`,
+            : `Need more information, searching for ${(
+                event.reflection.follow_up_queries || []
+              ).join(", ")}`,
         };
       } else if (event.finalize_answer) {
         processedEvent = {

@@ -49,7 +49,7 @@ export const InputForm: React.FC<InputFormProps> = ({
   return (
     <form
       onSubmit={handleInternalSubmit}
-      className={`flex flex-col gap-2 p-3 `}
+      className={`flex flex-col gap-2 p-3 pb-4`}
     >
       <div
         className={`flex flex-row items-center justify-between text-white rounded-3xl rounded-bl-sm ${

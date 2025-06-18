@@ -116,6 +116,13 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Prevent scroll bounce/overscroll on mobile */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  html {
+    /* Prevent scroll bounce on the entire page */
+    overscroll-behavior: none;
   }
 }
 
@@ -148,6 +155,32 @@
 }
 .animate-fadeInUpSmooth {
   animation: fadeInUpSmooth 0.3s ease-out forwards;
+}
+
+/* Prevent scroll bounce on scroll areas */
+[data-radix-scroll-area-viewport] {
+  overscroll-behavior: none !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide any white space that might appear during scroll bounce */
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Subtle scroll bar styling */
+[data-slot="scroll-area-scrollbar"] {
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+[data-slot="scroll-area"]:hover [data-slot="scroll-area-scrollbar"] {
+  opacity: 0.6;
+}
+
+[data-slot="scroll-area-thumb"] {
+  background-color: rgb(115 115 115 / 0.2) !important;
 }
 
 /* Ensure your body or html has a dark background if not already set, e.g.: */
