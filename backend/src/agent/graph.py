@@ -174,7 +174,7 @@ def reflection(state: OverallState, config: RunnableConfig) -> ReflectionState:
     return {
         "is_sufficient": result.is_sufficient,
         "knowledge_gap": result.knowledge_gap,
-        "follow_up_queries": result.follow_up_queries,
+        "follow_up_queries": result.follow_up_queries or [],
         "research_loop_count": state["research_loop_count"],
         "number_of_ran_queries": len(state["search_query"]),
     }

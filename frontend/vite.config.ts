@@ -9,10 +9,13 @@ export default defineConfig({
   base: "/app/",
   resolve: {
     alias: {
-      "@": path.resolve(new URL(".", import.meta.url).pathname, "./src"),
+      "@": path.resolve(__dirname, "src"),
     },
   },
   server: {
+    headers: {
+      "Content-Security-Policy": "script-src 'self' 'unsafe-eval' 'unsafe-inline';"
+    },
     proxy: {
       // Proxy API requests to the backend server
       "/api": {
